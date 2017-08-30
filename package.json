@@ -1,5 +1,5 @@
 {
-  "name": "apiOut",
+  "name": "api_out",
   "version": "0.1.1",
   "main": "lib/apiOut.js",
   "scripts": {
