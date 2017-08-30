@@ -27,7 +27,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/keel/kc.git"
+    "url": "git+ssh://git@github.com/keel/apiOut.git"
   },
   "devDependencies": {
     "chai": "*",
