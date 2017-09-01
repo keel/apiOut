@@ -17,4 +17,6 @@ apiOut information
 * v0.0.2:
 
 ## TODO:
-* will done
+* risk test
+* withDraw and search
+* test case

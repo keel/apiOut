@@ -13,6 +13,10 @@
     "s$_mongoDbName": "lysms",
     "s$_mongoUrl": "mongodb://user:pwd@127.0.0.1:27017/lysms"
   },
+  "riskLimitTable":"riskRule",
+  "blackUserTable":"user",
+  "productTable":"product",
+  "provinceTable":"provinceSeq",
   "startPort": 16001,
   "syncStartPort": 16002
 }
