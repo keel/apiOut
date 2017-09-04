@@ -12,8 +12,8 @@ const ktool = require('ktool');
 const testDatas = require('./testDatas');
 const kconfig = kc.kconfig;
 const vlog = require('vlog').instance(__filename);
-const apiName = testDatas.apiName;
-const apiType = testDatas.baoyueType; // 双数为点播，单数为包月，对应product表类型
+const apiName = testDatas.paras.apiName;
+const apiType = testDatas.paras.baoyueType; // 双数为点播，单数为包月，对应product表类型
 
 
 const mkOrder = function mkOrder(reqObj, productObj, callback) {
