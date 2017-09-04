@@ -39,7 +39,7 @@ describe('example1_包月业务测试', function() {
         }
         const reJson = JSON.parse(re);
         console.log('order reJson:%j', reJson);
-        expect(reJson.re).to.equal('0');
+        expect(reJson.re).to.eql('0');
         done();
       });
     });
@@ -52,7 +52,7 @@ describe('example1_包月业务测试', function() {
         }
         const reJson = JSON.parse(re);
         console.log('verify reJson:%j', reJson);
-        expect(reJson.re).to.equal('0');
+        expect(reJson.re).to.eql('0');
         done();
       });
     });
@@ -62,7 +62,7 @@ describe('example1_包月业务测试', function() {
         if (err) {
           return vlog.eo(err, 'receiveSync');
         }
-        expect(notiRe).to.equal(0);
+        expect(notiRe).to.eql(0);
         setTimeout(done, 100); //这里等待一段时间等数据库相关数据更新结束
       });
       api_in.mock_sync(100, true, function(err, re) {
@@ -72,7 +72,7 @@ describe('example1_包月业务测试', function() {
           return;
         }
         console.log('sync re:%j', re);
-        expect(re + '').to.equal('0');
+        expect(re + '').to.eql('0');
         //TODO 还有很多需要确定的值
       });
     });

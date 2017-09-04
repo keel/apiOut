@@ -9,8 +9,8 @@ const api_in_url = 'http://abcd.com';
 
 // 定死的测试用参数
 const paras = {
-  'apiName':'example1',
-  'api_in_url':api_in_url,
+  'apiName': 'example1',
+  'api_in_url': api_in_url,
   'baoyueType': 101,
   'dianboType': 102,
   'baoyueProductKey': 'aaaaaaaaaaaa',
@@ -23,8 +23,8 @@ const paras = {
   'apiInVerifyUrl': api_in_url + '/serv/billing',
   'sync_url': 'http://localhost:' + ktool.kconfig.get('syncStartPort') + '/sync',
   'out_url': 'http://localhost:' + ktool.kconfig.get('startPort') + '/',
-  'cpUrl':'http://xyz.com',
-  'cpNotiUrl':'http://xyz.com/noti'
+  'cpUrl': 'http://xyz.com',
+  'cpNotiUrl': 'http://xyz.com/noti'
 };
 
 let orderId = ktool.randomStr(20);
@@ -37,6 +37,15 @@ const getOrderId = function getOrderId() {
   return orderId;
 };
 
+let phone = 15301580000;
+const getPhone = function getPhone() {
+  return phone + '';
+};
+
+const newPhone = function newPhone() {
+  phone++;
+  return phone + '';
+};
 
 const createBaoYueProduct = function createBaoYueProduct(db, callback) {
   const eid = db.idObj('507f1f77bcf86cd799439011');
@@ -112,11 +121,31 @@ const nockClean = function nockClean() {
   nock.cleanAll();
 };
 
-const checkTableData = function checkTableData(query, len, compare, callback) {
-  //
+const checkTableData = function checkTableData(db, table, query, len, compareFn, callback) {
+  db.c(table).query(query, (err, queryRe) => {
+    if (err) {
+      return vlog.eo(err, 'checkTableData:query');
+    }
+    if (queryRe.length < len) {
+      return callback(null, 'len error' + queryRe.length);
+    }
+    const compareArr = [];
+    for (let i = 0, len = queryRe.length; i < len; i++) {
+      if (!compareFn(queryRe[i])) {
+        compareArr.push(queryRe);
+      }
+    }
+    if (compareArr.length > 0) {
+      return callback(null, compareArr);
+    }
+    callback(null, 'ok');
+  });
 };
 
 
+exports.getPhone = getPhone;
+exports.newPhone = newPhone;
+exports.checkTableData = checkTableData;
 exports.clearTestTables = clearTestTables;
 exports.createOrderId = createOrderId;
 exports.getOrderId = getOrderId;

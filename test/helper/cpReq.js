@@ -13,7 +13,7 @@ const vlog = require('vlog').instance(__filename);
 const baoyueOrder = function baoyueOrder(callback) {
   const reqObj = {
     'productKey': testDatas.paras.baoyueProductKey,
-    'phone': '15301589999',
+    'phone': testDatas.newPhone(),
     // 'orderMount': '1000',
     // 'iccid': '89860315747710835072',
     'imsi': '460110141997290',
