@@ -42,7 +42,7 @@ const baoyueOrder = function baoyueOrder(callback) {
 const baoyueVerify = function baoyueVerify(callback) {
   const reqObj = {
     'productKey': api_in.api_in_paras.baoyueProductKey,
-    'orderId': api_in.api_in_paras.baoyueOrderId,
+    'orderId': api_in.getOrderId(),
     'verifyCode': '1234',
     'timeStamp': cck.msToTime()
   };
@@ -62,6 +62,12 @@ const baoyueVerify = function baoyueVerify(callback) {
     // ======== order end =======`);
     callback(null, re);
   });
+};
+
+//TODO  模拟CP接收回调
+const receiveSync = function receiveSync(body, callback) {
+  const reJson = JSON.parse(body);
+
 };
 
 exports.baoyueOrder = baoyueOrder;

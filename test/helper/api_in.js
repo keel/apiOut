@@ -10,6 +10,7 @@ const vlog = require('vlog').instance(__filename);
 
 const api_in_url = 'http://abcd.com';
 
+// 定死的测试用参数
 const api_in_paras = {
   'baoyueType': 101,
   'dianboType': 102,
@@ -18,8 +19,6 @@ const api_in_paras = {
   'baoyueFeeCode': '1888888888',
   'dianboFeeCode': '19999999999',
   'appId': 'example_appid',
-  'baoyueOrderId': 'EEEEEEEEO3VCNHJFfg205',
-  'dianboOrderId': 'FFFFFFFFO3VCNHJFfg206',
   'cpid': '58183ea95024dc575880b9d9',
   'apiInOrderUrl': api_in_url + '/serv/getvrcode',
   'apiInVerifyUrl': api_in_url + '/serv/billing',
@@ -27,17 +26,26 @@ const api_in_paras = {
   'out_url': 'http://localhost:' + ktool.kconfig.get('startPort') + '/'
 };
 
+let orderId = ktool.randomStr(20);
+const createOrderId = function createOrderId() {
+  orderId = ktool.randomStr(20);
+  return orderId;
+};
+
+const getOrderId = function getOrderId() {
+  return orderId;
+};
 // let mock_order;
 // let mock_verify;
 
-const logCallback = (fnName) => (err, re) => {
-  if (err) {
-    return console.error(fnName, err);
-  }
-  console.log(fnName + ' re:%j', re.result);
-};
+// const logCallback = (fnName) => (err, re) => {
+//   if (err) {
+//     return console.error(fnName, err);
+//   }
+//   console.log(fnName + ' re:%j', re.result);
+// };
 
-const createBaoYueProduct = function createBaoYueProduct(db) {
+const createBaoYueProduct = function createBaoYueProduct(db, callback) {
   const eid = db.idObj('507f1f77bcf86cd799439011');
   const productExample = {
     'name': 'example包月',
@@ -54,10 +62,16 @@ const createBaoYueProduct = function createBaoYueProduct(db) {
     'feeCode': api_in_paras.baoyueFeeCode,
     'fee': 1000
   };
-  db.c(ktool.kconfig.get('productTable')).update({ _id: eid }, { '$set': productExample }, { 'upsert': true }, logCallback('createBaoYueProduct'));
+  db.c(ktool.kconfig.get('productTable')).update({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
+    if (err) {
+      return callback(vlog.ee(err, 'createBaoYueProduct'));
+    }
+    console.log('createBaoYueProduct done.');
+    callback(null);
+  });
 };
 
-const createDianBoProduct = function createDianBoProduct(db) {
+const createDianBoProduct = function createDianBoProduct(db, callback) {
   const eid = db.idObj('507f1f77bcf86cd799439012');
   const productExample = {
     'name': 'example点播',
@@ -74,7 +88,13 @@ const createDianBoProduct = function createDianBoProduct(db) {
     'feeCode': api_in_paras.dianboFeeCode,
     'fee': 1000
   };
-  db.c(ktool.kconfig.get('productTable')).update({ _id: eid }, { '$set': productExample }, { 'upsert': true }, logCallback('createDianBoProduct'));
+  db.c(ktool.kconfig.get('productTable')).update({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
+    if (err) {
+      return callback(vlog.ee(err, 'createBaoYueProduct'));
+    }
+    console.log('createDianBoProduct done.');
+    callback(null);
+  });
 };
 
 const clearExampleProducts = function clearExampleProducts(db) {
@@ -99,7 +119,10 @@ const nockAppIn = function nockAppIn() {
         if (checkParaRe.length > 0) {
           return { 'res_code': -888, 'message': 'order参数错误' + checkParaRe };
         }
-        return { 'res_code': 0, 'message': '短信验证码已成功发送', 'trade_id': api_in_paras.baoyueOrderId };
+
+        //TODO 校验签名
+
+        return { 'res_code': 0, 'message': '短信验证码已成功发送', 'trade_id': createOrderId() };
       } catch (e) {
         console.error(e.stack);
         return { 'res_code': -999, 'message': 'order请求参数错误' };
@@ -120,7 +143,11 @@ const nockAppIn = function nockAppIn() {
         if (checkParaRe.length > 0) {
           return { 'res_code': -888, 'message': 'verify参数错误' + checkParaRe };
         }
-        return { 'res_code': 0, 'message': '同步计费成功', 'trade_id': api_in_paras.dianboOrderId };
+
+        //TODO 校验签名
+
+
+        return { 'res_code': 0, 'message': '同步计费成功', 'trade_id': getOrderId() };
       } catch (e) {
         console.error(e.stack);
         return { 'res_code': -999, 'message': 'verify请求参数错误' };
@@ -131,11 +158,11 @@ const nockAppIn = function nockAppIn() {
 const nockClean = function nockClean() {
   nock.cleanAll();
 };
-const mock_sync = function mock_sync(syncType, isSucc, trade_id, callback) {
+const mock_sync = function mock_sync(syncType, isSucc, callback) {
   const syncRe = {
     'charge_result': 0,
     'sync_type': syncType || 100, //100为订购，300为退订
-    'trade_id': trade_id || ktool.randomStr(20)
+    'trade_id': getOrderId()
   };
   if (!isSucc) {
     syncRe.code = -1999;
@@ -145,7 +172,7 @@ const mock_sync = function mock_sync(syncType, isSucc, trade_id, callback) {
   }
   ktool.httpPost(api_in_paras.sync_url, JSON.stringify(syncRe), (err, syncRe) => {
     if (err) {
-      return callback(vlog.ee(err, 'mock_sync', trade_id));
+      return callback(vlog.ee(err, 'mock_sync', getOrderId()));
     }
     // console.log('syncRe:%j',syncRe);
     try {
@@ -161,6 +188,8 @@ const mock_sync = function mock_sync(syncType, isSucc, trade_id, callback) {
     }
   });
 };
+exports.createOrderId = createOrderId;
+exports.getOrderId = getOrderId;
 exports.createDianBoProduct = createDianBoProduct;
 exports.createBaoYueProduct = createBaoYueProduct;
 exports.clearExampleProducts = clearExampleProducts;

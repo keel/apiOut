@@ -1,5 +1,5 @@
 /*
-负责在内部与具体的计费平台对接
+使用apiOut的样例,负责在内部与具体的计费平台对接
  */
 'use strict';
 const apiOut = require('../../lib/apiOut');
