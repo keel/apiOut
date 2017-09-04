@@ -10,10 +10,10 @@ const testDatas = require('./testDatas');
 
 const vlog = require('vlog').instance(__filename);
 
-const baoyueOrder = function baoyueOrder(callback) {
+const baoyueOrder = function baoyueOrder(phone, callback) {
   const reqObj = {
     'productKey': testDatas.paras.baoyueProductKey,
-    'phone': testDatas.newPhone(),
+    'phone': phone || testDatas.newPhone(),
     // 'orderMount': '1000',
     // 'iccid': '89860315747710835072',
     'imsi': '460110141997290',

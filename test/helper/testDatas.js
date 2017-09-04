@@ -142,7 +142,6 @@ const checkTableData = function checkTableData(db, table, query, len, compareFn,
   });
 };
 
-
 exports.getPhone = getPhone;
 exports.newPhone = newPhone;
 exports.checkTableData = checkTableData;

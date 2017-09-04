@@ -81,7 +81,7 @@ const outActions = {
       ['cpOrder', /^\w{0,50}$/g],
       ['timeStamp', /^(\d{4})-(0\d{1}|1[0-2])-(0\d{1}|[12]\d{1}|3[01]) (0\d{1}|1\d{1}|2[0-3]):[0-5]\d{1}:([0-5]\d{1})$/i]
     ],
-    'riskChecker': apiRisk.baoyueOrderRisk,
+    'riskChecker': apiRisk.baoyueRisk,
     doAction: mkOrder
   },
   'verify': {
