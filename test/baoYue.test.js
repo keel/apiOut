@@ -18,7 +18,9 @@ describe('example1_包月业务测试', function() {
     example.syncStart();
     testDatas.createBaoYueProduct(db, function(err) {
       if (err) {
-        return vlog.eo(err);
+        vlog.eo(err);
+        done(err);
+        return;
       }
       done();
     });
@@ -27,17 +29,17 @@ describe('example1_包月业务测试', function() {
 
   after(function() {
     testDatas.clearExampleProducts(db);
-    // testDatas.clearTestTables();
+    // testDatas.clearTestTables(db, testDatas.paras.apiName);
     testDatas.nockClean();
   });
 
-  describe('正常成功处理流程', function() {
+  describe('正常包月成功处理流程', function() {
     // this.slow(500);
-    it('order 正常流程', function(done) {
+    it('order 包月正常流程', function(done) {
       cpReq.baoyueOrder(null, function(err, re) {
         if (err) {
           console.error(err);
-          done();
+          done(err);
           return;
         }
         const reJson = JSON.parse(re);
@@ -46,11 +48,11 @@ describe('example1_包月业务测试', function() {
         done();
       });
     });
-    it('verify 正常流程', function(done) {
+    it('verify 包月正常流程', function(done) {
       cpReq.baoyueVerify(function(err, re) {
         if (err) {
           console.error(err);
-          done();
+          done(err);
           return;
         }
         const reJson = JSON.parse(re);
@@ -60,18 +62,20 @@ describe('example1_包月业务测试', function() {
       });
     });
 
-    it('sync 正常流程', function(done) {
+    it('sync 包月正常流程', function(done) {
       cpReq.receiveSync(function(err, notiRe) {
         if (err) {
-          return vlog.eo(err, 'receiveSync');
+          vlog.eo(err, 'receiveSync');
+          done(err);
+          return;
         }
         expect(notiRe).to.eql(0);
         setTimeout(done, 100); //这里等待一段时间等数据库相关数据更新结束
       });
-      api_in.mock_sync(100, true, function(err, re) {
+      api_in.mock_sync(testDatas.paras.sync_url, 100, true, function(err, re) {
         if (err) {
           console.error(err);
-          done();
+          done(err);
           return;
         }
         // console.log('sync re:%j', re);

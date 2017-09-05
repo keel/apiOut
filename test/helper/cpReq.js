@@ -10,6 +10,35 @@ const testDatas = require('./testDatas');
 
 const vlog = require('vlog').instance(__filename);
 
+const dianboOrder = function dianboOrder(phone, callback) {
+  const reqObj = {
+    'productKey': testDatas.paras.dianboProductKey,
+    'phone': phone || testDatas.newPhone(),
+    'fee': '300',
+    'imsi': '460110141997290',
+    'imei': '99000856081851',
+    'cpOrder': 'testcporder20170823',
+    'timeStamp': cck.msToTime()
+  };
+  const cpSec = testDatas.paras.cpid;
+  const signSrc = '' + reqObj.productKey + reqObj.phone + reqObj.fee + reqObj.imsi + reqObj.imei + reqObj.cpOrder + reqObj.timeStamp + cpSec;
+  // console.log('signSrc:%s', signSrc);
+  const signStr = ktool.md5(signSrc).toUpperCase();
+  reqObj.sign = signStr;
+  // console.log('baoyueOrder', testDatas.paras.out_url);
+  ktool.httpPost(testDatas.paras.out_url2 + 'order', JSON.stringify(reqObj), function(err, re) {
+    // ktool.httpPost('http://58.223.2.136/tykj_api/order', JSON.stringify(reqObj), function(err, re) {
+    if (err) {
+      return callback(vlog.ee(err, 'httpPost'));
+    }
+    //     console.log(`
+    // ======== cp order ========
+    // ${re}
+    // ======== order end =======`);
+    callback(null, re);
+  });
+};
+
 const baoyueOrder = function baoyueOrder(phone, callback) {
   const reqObj = {
     'productKey': testDatas.paras.baoyueProductKey,
@@ -40,9 +69,9 @@ const baoyueOrder = function baoyueOrder(phone, callback) {
   });
 };
 
-const baoyueVerify = function baoyueVerify(callback) {
+const verify = function verify(outUrl, productKey, callback) {
   const reqObj = {
-    'productKey': testDatas.paras.baoyueProductKey,
+    'productKey': productKey,
     'orderId': testDatas.getOrderId(),
     'verifyCode': '1234',
     'timeStamp': cck.msToTime()
@@ -53,7 +82,7 @@ const baoyueVerify = function baoyueVerify(callback) {
   const signStr = ktool.md5(signSrc).toUpperCase();
   reqObj.sign = signStr;
   // console.log('baoyueVerify', testDatas.paras.out_url);
-  ktool.httpPost(testDatas.paras.out_url + 'verify', JSON.stringify(reqObj), function(err, re) {
+  ktool.httpPost(outUrl + 'verify', JSON.stringify(reqObj), function(err, re) {
     if (err) {
       return callback(vlog.ee(err, 'httpPost'));
     }
@@ -63,6 +92,14 @@ const baoyueVerify = function baoyueVerify(callback) {
     // ======== order end =======`);
     callback(null, re);
   });
+};
+
+const baoyueVerify = function baoyueVerify(callback) {
+  verify(testDatas.paras.out_url, testDatas.paras.baoyueProductKey, callback);
+};
+
+const dianboVerify = function dianboVerify(callback) {
+  verify(testDatas.paras.out_url2, testDatas.paras.dianboProductKey, callback);
 };
 
 // 模拟CP接收回调
@@ -89,4 +126,6 @@ const receiveSync = function receiveSync(callback) {
 
 exports.receiveSync = receiveSync;
 exports.baoyueOrder = baoyueOrder;
+exports.dianboOrder = dianboOrder;
+exports.dianboVerify = dianboVerify;
 exports.baoyueVerify = baoyueVerify;

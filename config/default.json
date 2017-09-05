@@ -18,5 +18,7 @@
   "productTable":"product",
   "provinceTable":"provinceSeq",
   "startPort": 16001,
-  "syncStartPort": 16002
+  "syncStartPort": 16002,
+  "startPort2": 16003,
+  "syncStartPort2": 16004
 }

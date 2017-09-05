@@ -1,5 +1,5 @@
 /*
-使用apiOut的样例,此为包月业务
+使用apiOut的样例2,此为点播业务
  */
 'use strict';
 const apiOut = require('../../lib/apiOut');
@@ -12,8 +12,8 @@ const ktool = require('ktool');
 const testDatas = require('./testDatas');
 const kconfig = kc.kconfig;
 const vlog = require('vlog').instance(__filename);
-const apiName = testDatas.paras.apiName; //自定义名称
-const apiType = testDatas.paras.baoyueType; //自定义类型, 双数为点播，单数为包月，对应product表类型
+const apiName = testDatas.paras.apiName2; //自定义名称
+const apiType = testDatas.paras.dianboType; //自定义类型, 双数为点播，单数为包月，对应product表类型
 
 
 const mkOrder = function mkOrder(reqObj, productObj, callback) {
@@ -21,6 +21,7 @@ const mkOrder = function mkOrder(reqObj, productObj, callback) {
     'app_id': productObj.appId,
     'fee_id': productObj.feeCode,
     'phone': reqObj.phone,
+    'amount': reqObj.fee,
     'sign': 'signStr' //mock不进行sign校验
   };
   // console.log('order action,reqObj:%j, productObj:%j \n%j', reqObj, productObj, JSON.stringify(orderReq));
@@ -36,7 +37,7 @@ const mkOrder = function mkOrder(reqObj, productObj, callback) {
         'orderId': orderReJson.trade_id, //使用计费平台的trade_id 作为本平台的orderId，如果计费平台的不能用，则需要自己生成一个平台唯一的orderId
         'plus': {
           'trade_id': orderReJson.trade_id, //额外记录到order表的字段,可用于后面的verify或sync
-          'pid': productObj.feeCode // 用于sync时能直接从order表取到feeCode
+          'fee': reqObj.fee //点播需要记入fee
         }
       };
       return callback(null, respObj);
@@ -76,12 +77,13 @@ const outActions = {
     'reqParas': [
       ['productKey', /^[A-Za-z0-9]{12}$/g],
       ['phone', /^1[\d]{10}$/g],
+      ['fee', /^[\d]{1,}$/g],
       ['imsi', /^[A-Za-z0-9]{10,20}$/g],
       ['imei', /^[A-Za-z0-9]{10,20}$/g],
       ['cpOrder', /^\w{0,50}$/g],
       ['timeStamp', /^(\d{4})-(0\d{1}|1[0-2])-(0\d{1}|[12]\d{1}|3[01]) (0\d{1}|1\d{1}|2[0-3]):[0-5]\d{1}:([0-5]\d{1})$/i]
     ],
-    'riskChecker': apiRisk.baoyueRisk,
+    'riskChecker': apiRisk.vrDianBoRisk,
     doAction: mkOrder
   },
   'verify': {
@@ -115,7 +117,7 @@ const syncAction = function(req, body, callback) {
     }
 
     const sync_user = (orderRe) ? orderRe.phone : null;
-    const sync_feeId = (orderRe) ? orderRe.pid : null;
+    const sync_fee = (orderRe) ? orderRe.fee : 0;
 
     const reObj = {
       'sync_re_code': result, //"0"是成功，其他是错误码
@@ -124,8 +126,7 @@ const syncAction = function(req, body, callback) {
       'sync_obj': syncObj, //sync原始数据，将存入sync表
       'sync_query': { 'trade_id': syncObj.trade_id }, //此次通知的唯一标识,用于防止同一sync多次发送
       'sync_user': sync_user, //用于用户关系表生成的用户phone
-      'sync_feeId': sync_feeId, //用于用户关系表生成的计费点ID,注意同一计费点退订请求请保持与订购一致
-      // 'sync_fee': orderRe.fee, //点播时需要传计费点价格，不需要feeId
+      'sync_fee': sync_fee, //点播时需要传计费点价格，不需要feeId
       'respBody': '{"res_code":"0"}', // 不同基地的异步通知接口回传的post body内容(string）
       'cpNoti': { 'phone': orderRe.phone }, //传给cp的部分内容,如果为null则不传给cp,api_out会加上orderId和cpOrder及状态(json)
       'orderQuery': { 'orderId': syncObj.trade_id } //更新原order表内容的条件,如果为null则不更新,注意为null时也无法通知cp,因为无法定位productKey
@@ -140,18 +141,18 @@ const syncAction = function(req, body, callback) {
 
 const outServer = {
   'serverName': apiName + '_out',
-  'port': kconfig.get('startPort'),
+  'port': kconfig.get('startPort2'),
   'serverType': 'out',
   'actions': outActions
 };
 
 const syncServer = {
   'serverName': apiName + '_sync',
-  'port': kconfig.get('syncStartPort'),
+  'port': kconfig.get('syncStartPort2'),
   'serverType': 'sync',
   'actions': {
     'sync': {
-      'riskChecker': apiRisk.baoyueRisk,
+      'riskChecker': apiRisk.vrDianBoRisk,
       'doAction': syncAction
     }
   }
@@ -160,7 +161,6 @@ const syncServer = {
 
 
 //orderAction,verifyAction,syncAction,withDrawAction,searchAction
-
 const api_out = apiOut.instance(apiName, apiType, [outServer, syncServer]);
 
 exports.start = api_out.servers.out.start;

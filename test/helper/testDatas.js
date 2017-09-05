@@ -10,6 +10,7 @@ const api_in_url = 'http://abcd.com';
 // 定死的测试用参数
 const paras = {
   'apiName': 'example1',
+  'apiName2': 'example2',
   'api_in_url': api_in_url,
   'baoyueType': 101,
   'dianboType': 102,
@@ -21,8 +22,12 @@ const paras = {
   'cpid': '58183ea95024dc575880b9d9',
   'apiInOrderUrl': api_in_url + '/serv/getvrcode',
   'apiInVerifyUrl': api_in_url + '/serv/billing',
+  'apiInOrderUrl2': api_in_url + '/dianbo/getvrcode',
+  'apiInVerifyUrl2': api_in_url + '/dianbo/billing',
   'sync_url': 'http://localhost:' + ktool.kconfig.get('syncStartPort') + '/sync',
   'out_url': 'http://localhost:' + ktool.kconfig.get('startPort') + '/',
+  'sync_url2': 'http://localhost:' + ktool.kconfig.get('syncStartPort2') + '/sync',
+  'out_url2': 'http://localhost:' + ktool.kconfig.get('startPort2') + '/',
   'cpUrl': 'http://xyz.com',
   'cpNotiUrl': 'http://xyz.com/noti'
 };
@@ -68,7 +73,7 @@ const createBaoYueProduct = function createBaoYueProduct(db, callback) {
     if (err) {
       return callback(vlog.ee(err, 'createBaoYueProduct'));
     }
-    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeNum': 0, 'monthFeeNum': 0 };
+    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeLimit': 0, 'monthFeeLimit': 0, 'dayFeeNum': 0, 'monthFeeNum': 0 };
     db.c(ktool.kconfig.get('riskLimitTable')).updateOne({ 'productKey': paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': riskData }, { 'upsert': true }, (err) => {
       if (err) {
         return callback(vlog.ee(err, 'createBaoYueProduct:riskRule'));
@@ -89,22 +94,21 @@ const createDianBoProduct = function createDianBoProduct(db, callback) {
     'key': paras.dianboProductKey,
     'ismpPid': '0',
     'cpid': paras.cpid,
-    'orderUrl': paras.apiInOrderUrl,
-    'verifyUrl': paras.apiInVerifyUrl,
+    'orderUrl': paras.apiInOrderUrl2,
+    'verifyUrl': paras.apiInVerifyUrl2,
     'needCallBack': 1,
     'callbackUrl': paras.cpNotiUrl,
     'state': 10,
     'appId': paras.appId,
-    'feeCode': paras.dianboFeeCode,
-    'fee': 500
+    'feeCode': paras.dianboFeeCode
   };
 
   db.c(ktool.kconfig.get('productTable')).updateOne({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
     if (err) {
       return callback(vlog.ee(err, 'createDianBoProduct'));
     }
-    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeNum': 0, 'monthFeeNum': 0 };
-    db.c(ktool.kconfig.get('riskLimitTable')).updateOne({ 'productKey': paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': riskData }, { 'upsert': true }, (err) => {
+    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeNum': 0, 'monthFeeNum': 0, 'dianBoDayUserLimit': 0, 'dianBoMonthUserLimit': 0 };
+    db.c(ktool.kconfig.get('riskLimitTable')).updateOne({ 'productKey': paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': riskData }, { 'upsert': true }, (err) => {
       if (err) {
         return callback(vlog.ee(err, 'createDianBoProduct:riskRule'));
       }
@@ -117,24 +121,26 @@ const createDianBoProduct = function createDianBoProduct(db, callback) {
 };
 
 
-const clearTestTables = function clearTestTables(db) {
-  db.c('example1_order').drop();
-  db.c('example1_sync').drop();
-  db.c('example1_user').drop();
-  db.c('example1_noti_cp').drop();
-  db.c('example1_withdraw').drop();
-  db.c('example1_search').drop();
-  console.log('example1_* tables droped.');
+const clearTestTables = function clearTestTables(db, apiName) {
+  db.c(apiName + '_order').drop();
+  db.c(apiName + '_sync').drop();
+  db.c(apiName + '_user').drop();
+  db.c(apiName + '_noti_cp').drop();
+  db.c(apiName + '_withdraw').drop();
+  db.c(apiName + '_search').drop();
+  console.log(apiName + '_* tables droped.');
 };
 
 const clearExampleProducts = function clearExampleProducts(db) {
   db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 101 });
-  db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 102 });
   db.c(ktool.kconfig.get('riskLimitTable')).deleteMany({ 'productKey': paras.baoyueProductKey });
+  console.log('example products cleaned.');
+};
+const clearExampleProducts2 = function clearExampleProducts2(db) {
+  db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 102 });
   db.c(ktool.kconfig.get('riskLimitTable')).deleteMany({ 'productKey': paras.dianboProductKey });
   console.log('example products cleaned.');
 };
-
 
 const nockClean = function nockClean() {
   nock.cleanAll();
@@ -161,6 +167,7 @@ const checkTableData = function checkTableData(db, table, query, len, compareFn,
   });
 };
 
+
 exports.getPhone = getPhone;
 exports.newPhone = newPhone;
 exports.checkTableData = checkTableData;
@@ -170,5 +177,6 @@ exports.getOrderId = getOrderId;
 exports.createDianBoProduct = createDianBoProduct;
 exports.createBaoYueProduct = createBaoYueProduct;
 exports.clearExampleProducts = clearExampleProducts;
+exports.clearExampleProducts2 = clearExampleProducts2;
 exports.nockClean = nockClean;
 exports.paras = paras;

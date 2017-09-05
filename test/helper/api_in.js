@@ -59,7 +59,59 @@ const nockAppIn = function nockAppIn() {
 
 };
 
-const mock_sync = function mock_sync(syncType, isSucc, callback) {
+const nockAppInDianBo = function nockAppInDianBo() {
+  nock(testDatas.paras.api_in_url)
+    .post('/dianbo/getvrcode')
+    .reply(200, function(uri, requestBody) {
+      try {
+        const reqJson = requestBody;
+        const checkParaRe = cck.checkBatch([
+          [reqJson.app_id, 'strLen', [2, 20]],
+          [reqJson.phone, 'strLen', [11, 20]],
+          [reqJson.amount, 'strInt', [1, 5]],
+          [reqJson.fee_id, 'strLen', [2, 20]]
+        ]);
+        if (checkParaRe.length > 0) {
+          return { 'res_code': -888, 'message': 'order参数错误' + checkParaRe };
+        }
+
+        //TODO 校验签名
+
+        return { 'res_code': 0, 'message': '短信验证码已成功发送', 'trade_id': testDatas.createOrderId() };
+      } catch (e) {
+        console.error(e.stack);
+        return { 'res_code': -999, 'message': 'order请求参数错误' };
+      }
+    });
+
+  nock(testDatas.paras.api_in_url)
+    .post('/dianbo/billing')
+    .reply(200, function(uri, requestBody) {
+      try {
+        const reqJson = requestBody;
+        const checkParaRe = cck.checkBatch([
+          [reqJson.app_id, 'strLen', [2, 20]],
+          [reqJson.fee_id, 'strLen', [2, 20]],
+          [reqJson.trade_id, 'strLen', [15, 25]],
+          [reqJson.sms_code, 'strLen', [4, 10]]
+        ]);
+        if (checkParaRe.length > 0) {
+          return { 'res_code': -888, 'message': 'verify参数错误' + checkParaRe };
+        }
+
+        //TODO 校验签名
+
+
+        return { 'res_code': 0, 'message': '同步计费成功', 'trade_id': testDatas.getOrderId() };
+      } catch (e) {
+        console.error(e.stack);
+        return { 'res_code': -999, 'message': 'verify请求参数错误' };
+      }
+    });
+
+};
+
+const mock_sync = function mock_sync(syncUrl, syncType, isSucc, callback) {
   const syncRe = {
     'charge_result': 0,
     'sync_type': syncType || 100, //100为订购，300为退订
@@ -71,7 +123,7 @@ const mock_sync = function mock_sync(syncType, isSucc, callback) {
   } else {
     syncRe.message = 'sync订购成功';
   }
-  ktool.httpPost(testDatas.paras.sync_url, JSON.stringify(syncRe), (err, syncRe) => {
+  ktool.httpPost(syncUrl, JSON.stringify(syncRe), (err, syncRe) => {
     if (err) {
       return callback(vlog.ee(err, 'mock_sync', testDatas.getOrderId()));
     }
@@ -93,7 +145,8 @@ const mock_sync = function mock_sync(syncType, isSucc, callback) {
 
 
 
+nockAppInDianBo();
 
-
+exports.nockAppInDianBo = nockAppInDianBo;
 exports.nockAppIn = nockAppIn;
 exports.mock_sync = mock_sync;
