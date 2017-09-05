@@ -71,7 +71,7 @@ const receiveSync = function receiveSync(callback) {
     .post('/noti')
     .reply(200, function(uri, requestBody) {
       try {
-        console.log('cp noti receiveSync:%j', requestBody);
+        // console.log('cp noti receiveSync:%j', requestBody);
         const reqJson = requestBody;
         if (reqJson.re + '' === '0') {
           callback(null, 0);

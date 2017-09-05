@@ -41,7 +41,7 @@ describe('example1_包月业务测试', function() {
           return;
         }
         const reJson = JSON.parse(re);
-        console.log('order reJson:%j', reJson);
+        // console.log('order reJson:%j', reJson);
         expect(reJson.re).to.eql('0');
         done();
       });
@@ -54,7 +54,7 @@ describe('example1_包月业务测试', function() {
           return;
         }
         const reJson = JSON.parse(re);
-        console.log('verify reJson:%j', reJson);
+        // console.log('verify reJson:%j', reJson);
         expect(reJson.re).to.eql('0');
         done();
       });
@@ -74,7 +74,7 @@ describe('example1_包月业务测试', function() {
           done();
           return;
         }
-        console.log('sync re:%j', re);
+        // console.log('sync re:%j', re);
         expect(re + '').to.eql('0');
         //TODO 还有很多需要确定的值
       });
@@ -108,7 +108,7 @@ describe('example1_包月业务测试', function() {
             return;
           }
           const reJson = JSON.parse(re);
-          console.log('黑名单 用户:%j, order reJson:%j', blackUser, reJson);
+          // console.log('黑名单 用户:%j, order reJson:%j', blackUser, reJson);
           expect(reJson.re).to.eql(errorCode.err.blackUser);
           db.c(blackUserTable).deleteMany({ 'phone': blackUser }, function(err) {
             if (err) {
@@ -135,7 +135,7 @@ describe('example1_包月业务测试', function() {
             return;
           }
           const reJson = JSON.parse(re);
-          console.log('产品下线 order reJson:%j', reJson);
+          // console.log('产品下线 order reJson:%j', reJson);
           expect(reJson.re).to.eql(errorCode.err.productDown);
           db.c(productTable).updateOne({ 'key': testDatas.paras.baoyueProductKey }, { '$set': { 'state': 10 } }, function(err) {
             if (err) {
@@ -147,9 +147,87 @@ describe('example1_包月业务测试', function() {
         });
       });
     });
+
+    it('省份关停', function(done) {
+      const table = kc.kconfig.get('riskLimitTable');
+      db.c(table).updateOne({ 'productKey': testDatas.paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': { 'state': -1 } }, { 'upsert': true }, function(err) {
+        if (err) {
+          vlog.eo(err);
+          return done(err);
+        }
+        cpReq.baoyueOrder(null, function(err, re) {
+          if (err) {
+            vlog.eo(err);
+            done(err);
+            return;
+          }
+          const reJson = JSON.parse(re);
+          // console.log('产品下线 order reJson:%j', reJson);
+          expect(reJson.re).to.eql(errorCode.err.provinceClosed);
+          db.c(table).updateOne({ 'productKey': testDatas.paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': { 'state': 0 } }, function(err) {
+            if (err) {
+              vlog.eo(err);
+              return done(err);
+            }
+            done();
+          });
+        });
+      });
+    });
+
+    it('日限到达', function(done) {
+      const table = kc.kconfig.get('riskLimitTable');
+      db.c(table).updateOne({ 'productKey': testDatas.paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': { 'state': 0, 'dayUserLimit': 5, 'dayUserNum': 5 } }, { 'upsert': true }, function(err) {
+        if (err) {
+          vlog.eo(err);
+          return done(err);
+        }
+        cpReq.baoyueOrder(null, function(err, re) {
+          if (err) {
+            vlog.eo(err);
+            done(err);
+            return;
+          }
+          const reJson = JSON.parse(re);
+          // console.log('产品下线 order reJson:%j', reJson);
+          expect(reJson.re).to.eql(errorCode.err.dayRiskLimit);
+          db.c(table).updateOne({ 'productKey': testDatas.paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': { 'state': 0, 'dayUserLimit': 0, 'dayUserNum': 0 } }, function(err) {
+            if (err) {
+              vlog.eo(err);
+              return done(err);
+            }
+            done();
+          });
+        });
+      });
+    });
+
+    it('月限到达', function(done) {
+      const table = kc.kconfig.get('riskLimitTable');
+      db.c(table).updateOne({ 'productKey': testDatas.paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': { 'state': 0, 'monthUserLimit': 5, 'monthUserNum': 5 } }, { 'upsert': true }, function(err) {
+        if (err) {
+          vlog.eo(err);
+          return done(err);
+        }
+        cpReq.baoyueOrder(null, function(err, re) {
+          if (err) {
+            vlog.eo(err);
+            done(err);
+            return;
+          }
+          const reJson = JSON.parse(re);
+          // console.log('产品下线 order reJson:%j', reJson);
+          expect(reJson.re).to.eql(errorCode.err.monthRiskLimit);
+          db.c(table).updateOne({ 'productKey': testDatas.paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': { 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0 } }, function(err) {
+            if (err) {
+              vlog.eo(err);
+              return done(err);
+            }
+            done();
+          });
+        });
+      });
+    });
   });
-  //TODO 模拟各类失败,risk情况
-
-  //TODO 点播测试
-
+  //TODO 模拟各类失败情况
 });

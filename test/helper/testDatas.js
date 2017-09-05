@@ -64,12 +64,20 @@ const createBaoYueProduct = function createBaoYueProduct(db, callback) {
     'feeCode': paras.baoyueFeeCode,
     'fee': 1000
   };
-  db.c(ktool.kconfig.get('productTable')).update({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
+  db.c(ktool.kconfig.get('productTable')).updateOne({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
     if (err) {
       return callback(vlog.ee(err, 'createBaoYueProduct'));
     }
-    console.log('createBaoYueProduct done.');
-    callback(null);
+    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeNum': 0, 'monthFeeNum': 0 };
+    db.c(ktool.kconfig.get('riskLimitTable')).updateOne({ 'productKey': paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': riskData }, { 'upsert': true }, (err) => {
+      if (err) {
+        return callback(vlog.ee(err, 'createBaoYueProduct:riskRule'));
+      }
+
+      console.log('createBaoYueProduct done.');
+      callback(null);
+
+    });
   });
 };
 
@@ -78,7 +86,7 @@ const createDianBoProduct = function createDianBoProduct(db, callback) {
   const productExample = {
     'name': 'example点播',
     'type': paras.dianboType, //与example.js相同
-    'key': paras.baoyueProductKey,
+    'key': paras.dianboProductKey,
     'ismpPid': '0',
     'cpid': paras.cpid,
     'orderUrl': paras.apiInOrderUrl,
@@ -88,14 +96,23 @@ const createDianBoProduct = function createDianBoProduct(db, callback) {
     'state': 10,
     'appId': paras.appId,
     'feeCode': paras.dianboFeeCode,
-    'fee': 1000
+    'fee': 500
   };
-  db.c(ktool.kconfig.get('productTable')).update({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
+
+  db.c(ktool.kconfig.get('productTable')).updateOne({ _id: eid }, { '$set': productExample }, { 'upsert': true }, (err) => {
     if (err) {
-      return callback(vlog.ee(err, 'createBaoYueProduct'));
+      return callback(vlog.ee(err, 'createDianBoProduct'));
     }
-    console.log('createDianBoProduct done.');
-    callback(null);
+    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeNum': 0, 'monthFeeNum': 0 };
+    db.c(ktool.kconfig.get('riskLimitTable')).updateOne({ 'productKey': paras.baoyueProductKey, 'provinceName': '江苏' }, { '$set': riskData }, { 'upsert': true }, (err) => {
+      if (err) {
+        return callback(vlog.ee(err, 'createDianBoProduct:riskRule'));
+      }
+
+      console.log('createDianBoProduct done.');
+      callback(null);
+
+    });
   });
 };
 
@@ -111,8 +128,10 @@ const clearTestTables = function clearTestTables(db) {
 };
 
 const clearExampleProducts = function clearExampleProducts(db) {
-  db.c(ktool.kconfig.get('productTable')).deleteOne({ 'type': 101 });
-  db.c(ktool.kconfig.get('productTable')).deleteOne({ 'type': 102 });
+  db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 101 });
+  db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 102 });
+  db.c(ktool.kconfig.get('riskLimitTable')).deleteMany({ 'productKey': paras.baoyueProductKey });
+  db.c(ktool.kconfig.get('riskLimitTable')).deleteMany({ 'productKey': paras.dianboProductKey });
   console.log('example products cleaned.');
 };
 
