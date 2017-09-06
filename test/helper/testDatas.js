@@ -22,6 +22,8 @@ const paras = {
   'cpid': '58183ea95024dc575880b9d9',
   'apiInOrderUrl': api_in_url + '/serv/getvrcode',
   'apiInVerifyUrl': api_in_url + '/serv/billing',
+  'apiInWithDrawUrl': api_in_url + '/serv/withdraw',
+  'apiInSearchUrl': api_in_url + '/serv/search',
   'apiInOrderUrl2': api_in_url + '/dianbo/getvrcode',
   'apiInVerifyUrl2': api_in_url + '/dianbo/billing',
   'sync_url': 'http://localhost:' + ktool.kconfig.get('syncStartPort') + '/sync',
@@ -62,6 +64,8 @@ const createBaoYueProduct = function createBaoYueProduct(db, callback) {
     'cpid': paras.cpid,
     'orderUrl': paras.apiInOrderUrl,
     'verifyUrl': paras.apiInVerifyUrl,
+    'withdrawUrl': paras.apiInWithDrawUrl,
+    'searchUrl': paras.apiInSearchUrl,
     'needCallBack': 1,
     'callbackUrl': paras.cpNotiUrl,
     'state': 10,
@@ -121,13 +125,15 @@ const createDianBoProduct = function createDianBoProduct(db, callback) {
 };
 
 
-const clearTestTables = function clearTestTables(db, apiName) {
+const clearTestTables = function clearTestTables(db, apiName, isBaoyue) {
   db.c(apiName + '_order').drop();
   db.c(apiName + '_sync').drop();
   db.c(apiName + '_user').drop();
   db.c(apiName + '_noti_cp').drop();
-  db.c(apiName + '_withdraw').drop();
-  db.c(apiName + '_search').drop();
+  if (isBaoyue) {
+    db.c(apiName + '_withdraw').drop();
+    db.c(apiName + '_search').drop();
+  }
   console.log(apiName + '_* tables droped.');
 };
 

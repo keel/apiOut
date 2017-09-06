@@ -102,6 +102,48 @@ const dianboVerify = function dianboVerify(callback) {
   verify(testDatas.paras.out_url2, testDatas.paras.dianboProductKey, callback);
 };
 
+const withdraw = function withdraw(phone, callback) {
+  const reqObj = {
+    'productKey': testDatas.paras.baoyueProductKey,
+    'phone': phone || testDatas.getPhone(),
+    'timeStamp': cck.msToTime()
+  };
+  const cpSec = testDatas.paras.cpid;
+  const signSrc = '' + reqObj.productKey + reqObj.phone + reqObj.timeStamp + cpSec;
+  // console.log('signSrc:%s', signSrc);
+  const signStr = ktool.md5(signSrc).toUpperCase();
+  reqObj.sign = signStr;
+  // console.log('withdraw', testDatas.paras.out_url);
+  ktool.httpPost(testDatas.paras.out_url + 'withdraw', JSON.stringify(reqObj), function(err, re) {
+    // ktool.httpPost('http://58.223.2.136/tykj_api/order', JSON.stringify(reqObj), function(err, re) {
+    if (err) {
+      return callback(vlog.ee(err, 'httpPost'));
+    }
+    callback(null, re);
+  });
+};
+
+const search = function search(phone, callback) {
+  const reqObj = {
+    'productKey': testDatas.paras.baoyueProductKey,
+    'phone': phone || testDatas.getPhone(),
+    'timeStamp': cck.msToTime()
+  };
+  const cpSec = testDatas.paras.cpid;
+  const signSrc = '' + reqObj.productKey + reqObj.phone + reqObj.timeStamp + cpSec;
+  // console.log('signSrc:%s', signSrc);
+  const signStr = ktool.md5(signSrc).toUpperCase();
+  reqObj.sign = signStr;
+  // console.log('search', testDatas.paras.out_url);
+  ktool.httpPost(testDatas.paras.out_url + 'search', JSON.stringify(reqObj), function(err, re) {
+    // ktool.httpPost('http://58.223.2.136/tykj_api/order', JSON.stringify(reqObj), function(err, re) {
+    if (err) {
+      return callback(vlog.ee(err, 'httpPost'));
+    }
+    callback(null, re);
+  });
+};
+
 // 模拟CP接收回调
 const receiveSync = function receiveSync(callback) {
   nock(testDatas.paras.cpUrl)
@@ -124,6 +166,8 @@ const receiveSync = function receiveSync(callback) {
     });
 };
 
+exports.withdraw = withdraw;
+exports.search = search;
 exports.receiveSync = receiveSync;
 exports.baoyueOrder = baoyueOrder;
 exports.dianboOrder = dianboOrder;

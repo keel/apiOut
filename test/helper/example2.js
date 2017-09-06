@@ -160,7 +160,7 @@ const syncServer = {
 
 
 
-//orderAction,verifyAction,syncAction,withDrawAction,searchAction
+//orderAction,verifyAction,syncAction,withdrawAction,searchAction
 const api_out = apiOut.instance(apiName, apiType, [outServer, syncServer]);
 
 exports.start = api_out.servers.out.start;

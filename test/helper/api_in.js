@@ -57,6 +57,50 @@ const nockAppIn = function nockAppIn() {
       }
     });
 
+  nock(testDatas.paras.api_in_url)
+    .post('/serv/withdraw')
+    .reply(200, function(uri, requestBody) {
+      try {
+        const reqJson = requestBody;
+        const checkParaRe = cck.checkBatch([
+          [reqJson.app_id, 'strLen', [2, 20]],
+          [reqJson.phone, 'strLen', [11, 20]],
+          [reqJson.fee_id, 'strLen', [2, 20]]
+        ]);
+        if (checkParaRe.length > 0) {
+          return { 'res_code': -888, 'message': 'withdraw参数错误' + checkParaRe };
+        }
+
+        //TODO 校验签名
+
+        return { 'res_code': 0, 'message': '退订成功' };
+      } catch (e) {
+        console.error(e.stack);
+        return { 'res_code': -999, 'message': '退订请求参数错误' };
+      }
+    });
+  nock(testDatas.paras.api_in_url)
+    .post('/serv/search')
+    .reply(200, function(uri, requestBody) {
+      try {
+        const reqJson = requestBody;
+        const checkParaRe = cck.checkBatch([
+          [reqJson.app_id, 'strLen', [2, 20]],
+          [reqJson.phone, 'strLen', [11, 20]],
+          [reqJson.fee_id, 'strLen', [2, 20]]
+        ]);
+        if (checkParaRe.length > 0) {
+          return { 'res_code': -888, 'message': '查询参数错误' };
+        }
+
+        //TODO 校验签名
+
+        return { 'res_code': 0, 'results': [{ 'type': 'order', 'time': '2017-8-5 11:23:33', 'state': '0' }, { 'type': 'withdraw', 'time': '2017-9-6 12:12:53', 'state': '0' }] };
+      } catch (e) {
+        console.error(e.stack);
+        return { 'res_code': -999, 'message': '查询请求参数错误' };
+      }
+    });
 };
 
 const nockAppInDianBo = function nockAppInDianBo() {
@@ -143,9 +187,6 @@ const mock_sync = function mock_sync(syncUrl, syncType, isSucc, callback) {
 };
 
 
-
-
-nockAppInDianBo();
 
 exports.nockAppInDianBo = nockAppInDianBo;
 exports.nockAppIn = nockAppIn;

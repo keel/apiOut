@@ -29,7 +29,7 @@ describe('example1_包月业务测试', function() {
 
   after(function() {
     testDatas.clearExampleProducts(db);
-    testDatas.clearTestTables(db, testDatas.paras.apiName);
+    testDatas.clearTestTables(db, testDatas.paras.apiName, true);
     testDatas.nockClean();
   });
 
@@ -83,6 +83,33 @@ describe('example1_包月业务测试', function() {
         //TODO 还有很多需要确定的值
       });
     });
+
+    it('withdraw 包月正常退订', function(done) {
+      const phone = testDatas.getPhone();
+      cpReq.withdraw(phone, function(err, withdrawRe) {
+        if (err) {
+          vlog.eo(err, 'withdraw');
+          done(err);
+          return;
+        }
+        const jsonRe = JSON.parse(withdrawRe);
+        expect(jsonRe.re).to.eql('0');
+        done();
+      });
+    });
+    it('search 包月正常查询', function(done) {
+      const phone = testDatas.getPhone();
+      cpReq.search(phone, function(err, searchRe) {
+        if (err) {
+          vlog.eo(err, 'search');
+          done(err);
+          return;
+        }
+        const jsonRe = JSON.parse(searchRe);
+        expect(jsonRe.re).to.eql('0');
+        done();
+      });
+    });
   });
   describe('包月风控测试', function() {
     beforeEach(function() {
@@ -91,12 +118,7 @@ describe('example1_包月业务测试', function() {
     afterEach(function() {
       testDatas.nockClean();
     });
-    //黑名单用户
 
-    //产品下线
-    //省份关停
-    //日限
-    //月限
     it('黑名单', function(done) {
       const blackUser = testDatas.newPhone();
       const blackUserTable = kc.kconfig.get('blackUserTable');

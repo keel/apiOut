@@ -71,6 +71,57 @@ const mkVerify = function mkVerify(verifyCode, orderObj, callback) {
   });
 };
 
+
+const withdraw = function withdraw(cpReqObj, productObj, callback) {
+  const reqObj = {
+    'app_id': productObj.appId,
+    'fee_id': productObj.feeCode,
+    'phone': cpReqObj.phone,
+    'sign': 'signStr'
+  };
+  // console.log('withdrawUrl:%j',productObj.withdrawUrl);
+  ktool.httpPost(productObj.withdrawUrl, JSON.stringify(reqObj), (err, withdrawRe) => {
+    if (err) {
+      return callback(vlog.ee(err, 'withdraw:httpPost', reqObj));
+    }
+    try {
+      const withdrawReJson = JSON.parse(withdrawRe);
+      const respObj = {
+        'code': (withdrawReJson.res_code + '' === '0') ? '0' : withdrawReJson.res_code + '',
+        'desc': withdrawReJson.message
+      };
+      return callback(null, respObj);
+    } catch (e) {
+      return callback(vlog.ee(e, 'withdraw:re', reqObj));
+    }
+  });
+};
+
+const search = function search(cpReqObj, productObj, callback) {
+  const reqObj = {
+    'app_id': productObj.appId,
+    'fee_id': productObj.feeCode,
+    'phone': cpReqObj.phone,
+    'sign': 'signStr'
+  };
+  ktool.httpPost(productObj.searchUrl, JSON.stringify(reqObj), (err, searchRe) => {
+    if (err) {
+      return callback(vlog.ee(err, 'search:httpPost', reqObj));
+    }
+    try {
+      const searchReJson = JSON.parse(searchRe);
+      const respObj = {
+        'code': searchReJson.res_code + '',
+        'desc': searchReJson.message || searchReJson.results
+      };
+      return callback(null, respObj);
+    } catch (e) {
+      return callback(vlog.ee(e, 'search:re', reqObj));
+    }
+  });
+};
+
+
 const outActions = {
   'order': {
     'reqParas': [
@@ -99,7 +150,9 @@ const outActions = {
         mkVerify(reqObj.verifyCode, orderObj, callback);
       });
     }
-  }
+  },
+  'withdraw': apiActions.actionMap.withdraw(withdraw),
+  'search': apiActions.actionMap.search(search)
 };
 
 const syncAction = function(req, body, callback) {
@@ -159,7 +212,7 @@ const syncServer = {
 
 
 
-//orderAction,verifyAction,syncAction,withDrawAction,searchAction
+//orderAction,verifyAction,syncAction,withdrawAction,searchAction
 
 const api_out = apiOut.instance(apiName, apiType, [outServer, syncServer]);
 
