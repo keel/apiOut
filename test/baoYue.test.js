@@ -29,7 +29,7 @@ describe('example1_包月业务测试', function() {
 
   after(function() {
     testDatas.clearExampleProducts(db);
-    // testDatas.clearTestTables(db, testDatas.paras.apiName);
+    testDatas.clearTestTables(db, testDatas.paras.apiName);
     testDatas.nockClean();
   });
 

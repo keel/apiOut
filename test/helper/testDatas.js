@@ -134,12 +134,12 @@ const clearTestTables = function clearTestTables(db, apiName) {
 const clearExampleProducts = function clearExampleProducts(db) {
   db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 101 });
   db.c(ktool.kconfig.get('riskLimitTable')).deleteMany({ 'productKey': paras.baoyueProductKey });
-  console.log('example products cleaned.');
+  console.log('example1 products cleaned.');
 };
 const clearExampleProducts2 = function clearExampleProducts2(db) {
   db.c(ktool.kconfig.get('productTable')).deleteMany({ 'type': 102 });
   db.c(ktool.kconfig.get('riskLimitTable')).deleteMany({ 'productKey': paras.dianboProductKey });
-  console.log('example products cleaned.');
+  console.log('example2 products cleaned.');
 };
 
 const nockClean = function nockClean() {
