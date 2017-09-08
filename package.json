@@ -1,6 +1,6 @@
 {
   "name": "api_out",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "main": "lib/apiOut.js",
   "scripts": {
     "test": "mocha",

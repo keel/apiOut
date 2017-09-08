@@ -29,7 +29,7 @@ describe('example2_点播业务测试', function() {
 
   after(function() {
     testDatas.clearExampleProducts2(db);
-    testDatas.clearTestTables(db, testDatas.paras.apiName2);
+    // testDatas.clearTestTables(db, testDatas.paras.apiName2);
     testDatas.nockClean();
   });
 
