@@ -231,7 +231,7 @@ describe('example2_点播业务测试', function() {
     it('单用户日限到达', function(done) {
       const table = testDatas.paras.apiName2 + '_user';
       const phone = testDatas.newPhone();
-      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserLimit': 300 } }, { 'upsert': true }, function(err) {
+      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserLimit': 300, 'dayFeeLimit': 0, 'monthFeeLimit': 0 } }, { 'upsert': true }, function(err) {
         if (err) {
           vlog.eo(err);
           return done(err);
@@ -250,18 +250,12 @@ describe('example2_点播业务测试', function() {
             const reJson = JSON.parse(re);
             // console.log('产品下线 order reJson:%j', reJson);
             expect(reJson.re).to.eql(errorCode.err.dianBoDayUserCost);
-            db.c(table).updateOne({ 'userId': phone }, { '$set': { 'state': 0, 'dianBoDayCost': 0 } }, function(err) {
+            db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserLimit': 0 } }, function(err) {
               if (err) {
                 vlog.eo(err);
                 return done(err);
               }
-              db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserLimit': 0 } }, function(err) {
-                if (err) {
-                  vlog.eo(err);
-                  return done(err);
-                }
-                done();
-              });
+              done();
             });
           });
         });
@@ -270,7 +264,7 @@ describe('example2_点播业务测试', function() {
     it('单用户月限到达', function(done) {
       const table = testDatas.paras.apiName2 + '_user';
       const phone = testDatas.newPhone();
-      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserLimit': 300 } }, { 'upsert': true }, function(err) {
+      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserLimit': 300, 'dayFeeLimit': 0, 'monthFeeLimit': 0 } }, { 'upsert': true }, function(err) {
         if (err) {
           vlog.eo(err);
           return done(err);
@@ -289,23 +283,17 @@ describe('example2_点播业务测试', function() {
             const reJson = JSON.parse(re);
             // console.log('产品下线 order reJson:%j', reJson);
             expect(reJson.re).to.eql(errorCode.err.dianBoMonthUserCost);
-            db.c(table).updateOne({ 'userId': phone }, { '$set': { 'state': 0, 'dianBoMonthCost': 0 } }, function(err) {
+            db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserLimit': 0 } }, function(err) {
               if (err) {
                 vlog.eo(err);
                 return done(err);
               }
-              db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserLimit': 0 } }, function(err) {
-                if (err) {
-                  vlog.eo(err);
-                  return done(err);
-                }
-                done();
-              });
+              done();
             });
           });
         });
       });
     });
-  //TODO 模拟各类失败情况
+    //TODO 模拟各类失败情况
   });
 });
