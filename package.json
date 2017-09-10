@@ -1,6 +1,6 @@
 {
   "name": "api_out",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "main": "lib/apiOut.js",
   "scripts": {
     "test": "mocha",
@@ -16,7 +16,7 @@
     "mongodb": "^2.2.30",
     "redis": "^2.7.1",
     "request": "^2.81.0",
-    "vlog": "^0.2.11",
+    "vlog": "^0.2.12",
     "xml2js": "^0.4.9"
   },
   "author": "keel",
