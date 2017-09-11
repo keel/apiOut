@@ -111,7 +111,7 @@ const createDianBoProduct = function createDianBoProduct(db, callback) {
     if (err) {
       return callback(vlog.ee(err, 'createDianBoProduct'));
     }
-    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeNum': 0, 'monthFeeNum': 0, 'dianBoDayUserLimit': 0, 'dianBoMonthUserLimit': 0 };
+    const riskData = { 'productName': paras.apiName, 'state': 0, 'monthUserLimit': 0, 'monthUserNum': 0, 'dayUserLimit': 0, 'dayUserNum': 0, 'dayFeeAmount': 0, 'monthFeeAmount': 0, 'dayFeeLimit': 0, 'monthFeeLimit': 0, 'dianBoDayUserCostLimit': 0, 'dianBoMonthUserCostLimit': 0 };
     db.c(ktool.kconfig.get('riskLimitTable')).updateOne({ 'productKey': paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': riskData }, { 'upsert': true }, (err) => {
       if (err) {
         return callback(vlog.ee(err, 'createDianBoProduct:riskRule'));

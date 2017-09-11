@@ -29,7 +29,7 @@ describe('example2_点播业务测试', function() {
 
   after(function() {
     testDatas.clearExampleProducts2(db);
-    // testDatas.clearTestTables(db, testDatas.paras.apiName2);
+    testDatas.clearTestTables(db, testDatas.paras.apiName2);
     testDatas.nockClean();
   });
 
@@ -231,12 +231,12 @@ describe('example2_点播业务测试', function() {
     it('单用户日限到达', function(done) {
       const table = testDatas.paras.apiName2 + '_user';
       const phone = testDatas.newPhone();
-      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserLimit': 300, 'dayFeeLimit': 0, 'monthFeeLimit': 0 } }, { 'upsert': true }, function(err) {
+      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserCostLimit': 300, 'dayFeeLimit': 0, 'monthFeeLimit': 0 } }, { 'upsert': true }, function(err) {
         if (err) {
           vlog.eo(err);
           return done(err);
         }
-        db.c(table).updateOne({ 'userId': phone }, { '$set': { 'state': 0, 'dianBoDayCost': 300 } }, { 'upsert': true }, function(err) {
+        db.c(table).updateOne({ 'userId': phone }, { '$set': { 'state': 0, 'dianBoDayUserCost': 300 } }, { 'upsert': true }, function(err) {
           if (err) {
             vlog.eo(err);
             return done(err);
@@ -250,7 +250,7 @@ describe('example2_点播业务测试', function() {
             const reJson = JSON.parse(re);
             // console.log('产品下线 order reJson:%j', reJson);
             expect(reJson.re).to.eql(errorCode.err.dianBoDayUserCost);
-            db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserLimit': 0 } }, function(err) {
+            db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoDayUserCostLimit': 0 } }, function(err) {
               if (err) {
                 vlog.eo(err);
                 return done(err);
@@ -264,12 +264,12 @@ describe('example2_点播业务测试', function() {
     it('单用户月限到达', function(done) {
       const table = testDatas.paras.apiName2 + '_user';
       const phone = testDatas.newPhone();
-      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserLimit': 300, 'dayFeeLimit': 0, 'monthFeeLimit': 0 } }, { 'upsert': true }, function(err) {
+      db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserCostLimit': 300, 'dayFeeLimit': 0, 'monthFeeLimit': 0 } }, { 'upsert': true }, function(err) {
         if (err) {
           vlog.eo(err);
           return done(err);
         }
-        db.c(table).updateOne({ 'userId': phone }, { '$set': { 'state': 0, 'dianBoMonthCost': 300 } }, { 'upsert': true }, function(err) {
+        db.c(table).updateOne({ 'userId': phone }, { '$set': { 'state': 0, 'dianBoMonthUserCost': 300 } }, { 'upsert': true }, function(err) {
           if (err) {
             vlog.eo(err);
             return done(err);
@@ -283,7 +283,7 @@ describe('example2_点播业务测试', function() {
             const reJson = JSON.parse(re);
             // console.log('产品下线 order reJson:%j', reJson);
             expect(reJson.re).to.eql(errorCode.err.dianBoMonthUserCost);
-            db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserLimit': 0 } }, function(err) {
+            db.c(kc.kconfig.get('riskLimitTable')).updateOne({ 'productKey': testDatas.paras.dianboProductKey, 'provinceName': '江苏' }, { '$set': { 'dianBoMonthUserCostLimit': 0 } }, function(err) {
               if (err) {
                 vlog.eo(err);
                 return done(err);
