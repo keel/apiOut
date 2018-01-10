@@ -3,11 +3,11 @@
     "no-var": [2],
     "object-shorthand": [2, "always", {
       ignoreConstructors: false,
-      avoidQuotes: true,
+      avoidQuotes: true
     }],
     "prefer-const": [2, {
       destructuring: "any",
-      ignoreReadBeforeAssign: true,
+      ignoreReadBeforeAssign: true
     }],
     "indent": [1, 2],
     "quotes": [2, "single"],
@@ -23,6 +23,5 @@
     "jquery": true,
     "es6": true
   },
-
   "extends": "eslint:recommended"
 }
