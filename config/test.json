@@ -1,0 +1,31 @@
+{
+  "ver": 1,
+  "project": "apiOut",
+  "ts": "test",
+  "redis": {
+    "init": true,
+    "s$_redisIP": "127.0.0.1",
+    "s$_redisPort": 6379,
+    "s$_pwd": false
+  },
+  "mongo": {
+    "init": true,
+    "s$_mongoDbName": "lysms",
+    "s$_mongoUrl": "mongodb://user:pwd@127.0.0.1:27017/lysms"
+  },
+  "riskLimitTable":"riskRule",
+  "blackUserTable":"user",
+  "productTable":"product",
+  "provinceTable":"provinceSeq",
+  "resetByDay":[
+    { "tableName": "pdProvince", "monthCol": "monthCost", "dayCol": "dayCost" },
+    { "tableName": "user", "monthCol": "monthCost", "dayCol": "dayCost" },
+    { "tableName": "riskProvince", "monthCol": "monthCost", "dayCol": "dayCost" },
+    { "tableName": "riskRule", "monthCol": "monthUserNum", "dayCol": "dayUserNum" },
+    { "tableName": "riskRule", "monthCol": "monthFeeNum", "dayCol": "dayFeeNum" }
+  ],
+  "startPort": 16001,
+  "syncStartPort": 16002,
+  "startPort2": 16003,
+  "syncStartPort2": 16004
+}

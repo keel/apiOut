@@ -1,6 +1,6 @@
 {
   "name": "api_out",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "main": "lib/apiOut.js",
   "scripts": {
     "test": "mocha",
@@ -11,9 +11,9 @@
     "bson": "^0.4.20",
     "cck": "^1.0.12",
     "iconv-lite": "^0.4.18",
-    "kc": "^2.0.37",
-    "ktool": "^1.0.17",
-    "mongodb": "^2.2.30",
+    "kc": "^2.0.53",
+    "ktool": "^1.0.39",
+    "mongodb": "^3.1.6",
     "redis": "^2.7.1",
     "request": "^2.81.0",
     "vlog": "^0.2.12",

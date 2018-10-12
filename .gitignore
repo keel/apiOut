@@ -2,7 +2,8 @@ web/render/*
 !web/render/index.js
 config/*
 !config/default.json
-
+!config/test.json
+package-lock.json
 
 ### Node ###
 
