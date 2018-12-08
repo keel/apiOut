@@ -1,6 +1,6 @@
 {
   "name": "api_out",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "main": "lib/apiOut.js",
   "scripts": {
     "test": "mocha",
@@ -9,13 +9,13 @@
   "dependencies": {
     "aes-cross": "^1.0.8",
     "bson": "^0.4.20",
-    "cck": "^1.0.12",
-    "iconv-lite": "^0.4.18",
-    "kc": "^2.0.53",
-    "ktool": "^1.0.39",
-    "mongodb": "^3.1.6",
+    "cck": "^1.0.15",
+    "iconv-lite": "^0.4.24",
+    "kc": "^2.0.58",
+    "ktool": "^1.0.40",
+    "mongodb": "^3.1.10",
     "redis": "^2.7.1",
-    "request": "^2.81.0",
+    "request": "^2.88.0",
     "vlog": "^0.2.12",
     "xml2js": "^0.4.9"
   },
@@ -26,8 +26,8 @@
     "url": "git+ssh://git@github.com/keel/apiOut.git"
   },
   "devDependencies": {
-    "chai": "*",
-    "mocha": "*",
-    "nock": "^9.0.14"
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "nock": "^9.6.1"
   }
 }
