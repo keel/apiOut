@@ -1,6 +1,6 @@
 {
   "name": "api_out",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "main": "lib/apiOut.js",
   "scripts": {
     "test": "mocha",
@@ -9,11 +9,11 @@
   "dependencies": {
     "aes-cross": "^1.0.8",
     "bson": "^0.4.20",
-    "cck": "^1.0.15",
+    "cck": "^1.0.16",
     "iconv-lite": "^0.4.24",
-    "kc": "^2.0.58",
-    "ktool": "^1.0.40",
-    "mongodb": "^3.1.10",
+    "kc": "^2.0.60",
+    "ktool": "^1.0.51",
+    "mongodb": "^3.2.2",
     "redis": "^2.7.1",
     "request": "^2.88.0",
     "vlog": "^0.2.12",
